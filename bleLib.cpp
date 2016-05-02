@@ -161,7 +161,7 @@ void gatts_callback_init(vm_bt_gatt_server_callback_t *gatts_cb)
 
 void gatt_init(void)
 {
-#define OLD
+//#define OLD
 #ifdef OLD
     VM_BT_CM_POWER_STATUS bt_power_status;
     VMINT hdl;
@@ -194,7 +194,6 @@ void gatt_init(void)
 
 #else
     myServer.enable();
-	myServer.start();
 #endif
 
 }
@@ -248,8 +247,6 @@ void btcm_cb(VM_BT_CM_EVENT evt, void* param, void* user_data)
     }
 }
 
-static VMUINT8 myserviceUUID[] = {0xFD, 0x36, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x01, 0xFE};
-GATTService myService(myserviceUUID, true);
 
 void gatts_register_server_cb(void *context_handle, VMBOOL status, VMUINT8 app_uuid[16])
 {
@@ -277,11 +274,12 @@ void gatts_register_server_cb(void *context_handle, VMBOOL status, VMUINT8 app_u
                     vm_log_info("[Battery GATT] add service");
 				    vm_bt_gatt_server_add_service(context_handle, g_battery_srv_uuid_ptr, 10);
 			    }
-
+#ifdef NOPE
 			    // rhb
 				vm_log_info("registering rhb service");
 			    myService.registerMe(context_handle);
 			    // rhb
+#endif
 		    }
 		    else
 		    {
@@ -310,16 +308,10 @@ void gatts_register_server_cb(void *context_handle, VMBOOL status, VMUINT8 app_u
 }
 
 
-const int myReadHook()
-{
-	static int foo = 13;
-
-	vm_log_info("in the readhook");
-	return foo++;
-}
-
+#ifdef NOPE
 GATTCharacteristic *myChar = NULL;
 GATTCharacteristic *c2 = NULL;
+#endif
 
 void gatts_add_service_cb(VMBOOL status, void *context_handle, vm_bt_gatt_service_info_t *srvc_id,
                           VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)
@@ -360,6 +352,7 @@ void gatts_add_service_cb(VMBOOL status, void *context_handle, vm_bt_gatt_servic
 	}
     else
     {
+#ifdef NOPE
 		if (status == 0)
 		{
 			myService.serviceHandle(srvc_handle);
@@ -389,6 +382,7 @@ void gatts_add_service_cb(VMBOOL status, void *context_handle, vm_bt_gatt_servic
 		{
 			vm_log_info("status non zero, not registering characteristic");
 		}
+#endif
     }
 }
 
@@ -426,9 +420,11 @@ void gatts_add_characteristic_cb(VMBOOL status, void *context_handle, vm_bt_gatt
 	}
     else
     {
+#ifdef NOPE
     	// rhb
     	myService.registerCharacteristic(uuid, char_handle);
     	myService.start(context_handle, srvc_handle);
+#endif
     }
 }
 
@@ -464,12 +460,14 @@ void gatts_start_service_cb(VMBOOL status, void *context_handle, VM_BT_GATT_ATTR
 	}
     else
     {
+#ifdef NOPE
     	// rhb
     	if (status == 0)
     	{
 			vm_bt_gatt_server_listen(context_handle, VM_TRUE);
 			vm_log_info("listening on service");
     	}
+#endif
     }
 }
 
@@ -587,12 +585,14 @@ void gatts_request_read_cb(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_
 	}
     else
     {
+#ifdef NOPE
     	// find appropriate GATTCharacteristic in service to invoke method
     	//gatts_read_rhb_response(conn, trans_id, attr_handle, offset);
     	if (GATTCharacteristic *activeChar = myService.find(attr_handle))
     	{
     		activeChar->readRequest(conn, trans_id, attr_handle, offset);
     	}
+#endif
     }
 }
 
@@ -613,6 +613,7 @@ void gatts_request_write_cb(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm
                 value->length, value->data[0], value->data[1], value->data[2]);
 		}
 	}
+#ifdef NOPE
 	else
 	{
         // TODO
@@ -629,6 +630,7 @@ void gatts_request_write_cb(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm
 
 		vm_bt_gatt_server_send_response(conn, trans_id, 0, attr_handle, value);
 	}
+#endif
 }
 
 void gatts_request_exec_write_cb(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id,

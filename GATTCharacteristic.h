@@ -62,16 +62,13 @@ public:
 	// maybe there's a onRead() and onWrite(), defaults to nothing, which is overwritten.  but that means each instance requires subclassing
 	//
 
-	void readRequest(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, VMUINT16 offset)
+	void readRequest(vm_bt_gatt_attribute_value_t *att_value, const VMUINT16 offset)
 	{
-	    vm_bt_gatt_attribute_value_t att_value;
 	    VMINT value = read();
 
 	    vm_log_info("read object %d", value);
-	    memcpy(&(att_value.data[offset]), &value, sizeof(value));
-	    att_value.length = sizeof(value);
-
-	    vm_bt_gatt_server_send_response(conn, trans_id, 0, attr_handle, &att_value);
+	    memcpy(&(att_value->data[offset]), &value, sizeof(value));
+	    att_value->length = sizeof(value);
 	}
 
 	void registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle)
@@ -83,13 +80,21 @@ public:
         _isRegistered = true;
 	}
 
-	// would be pure virtual
-	void write(const int value)
+	void onWrite(int value)
 	{
 		static int bar = 0;
 
 		bar = value;
 		vm_log_info("wrote value %d", bar);
+	}
+
+	// could be pure virtual
+	void writeRequest(const vm_bt_gatt_attribute_value_t *value)
+	{
+		int myInt = 0;
+		memcpy(&myInt, value->data, value->length < sizeof(myInt) ? value->length : sizeof(myInt));
+
+		onWrite(myInt);
 	}
 
 	void changeProperties()

@@ -198,11 +198,8 @@ protected:
 	static void connection_callback(const vm_bt_gatt_connection_t *conn, VMBOOL connected,
 			const vm_bt_gatt_address_t *bd_addr)
 	{
-		// this may be unnecessary
-		// vm_bt_gatt_server_listen(conn->connection_handle, VM_FALSE);
-		// can determine service by conn->context_handle
 		// maybe invoke callback for listener
-		vm_log_info("connection_callback connected [%d] [0x%x, 0x%x] -s", connected, conn->context_handle, conn->connection_handle);
+		vm_log_info("connection_callback connected [%d] [0x%x, 0x%x]", connected, conn->context_handle, conn->connection_handle);
 	}
 	static void request_read_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
 			VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, VMUINT16 offset, VMBOOL is_long)
@@ -210,7 +207,10 @@ protected:
 		// find appropriate GATTCharacteristic in service to invoke method
 		if (GATTCharacteristic *activeChar = _singleton->findCharacteristic(attr_handle))
 		{
-			activeChar->readRequest(conn, trans_id, attr_handle, offset);
+		    vm_bt_gatt_attribute_value_t att_value;
+
+		    activeChar->readRequest(&att_value, offset);
+		    vm_bt_gatt_server_send_response(conn, trans_id, 0, attr_handle, &att_value);
 		}
 	}
 	static void request_write_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
@@ -219,10 +219,7 @@ protected:
 	{
 		if (GATTCharacteristic *activeChar = _singleton->findCharacteristic(attr_handle))
 		{
-			int myInt = 0;
-			memcpy(&myInt, value->data, value->length < sizeof(myInt) ? value->length : sizeof(myInt));
-
-			activeChar->write(myInt);
+			activeChar->writeRequest(value);
 
 		    if (need_rsp)
 			{

@@ -60,6 +60,7 @@ public:
 		return true;
 	}
 
+protected:
 	void registerServices()
 	{
 		for (const auto & each : _services)
@@ -107,6 +108,11 @@ public:
 		return activeChar;
 	}
 
+	const bool contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const
+	{
+		return context == _context;
+	}
+
 	// static void callbacks go here
 	static void btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data)
 	{
@@ -134,7 +140,7 @@ public:
 
 	static void register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status, VMUINT8 *app_uuid)
 	{
-		// fix: check uuid matches server uuid
+		// is it necessary to check if uuid matches server uuid?
 		_singleton->_context = context_handle;
 
 		if (status == 0)
@@ -146,8 +152,7 @@ public:
 	static void service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_service_info_t *srvc_id, VM_BT_GATT_SERVICE_HANDLE srvc_handle)
 	{
-		// fix: check context_handle == context
-		if (status == 0)
+		if (_singleton->contextValid(context_handle) && status == 0)
 		{
 			vm_log_info("rhb service add callback adding characteristics");
 
@@ -162,8 +167,7 @@ public:
 			vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 			VM_BT_GATT_CHARACTERISTIC_HANDLE char_handle)
 	{
-		// fix: check context matches
-		if (status == 0)
+		if (_singleton->contextValid(context_handle) && status == 0)
 		{
 			if (GATTService *activeService = _singleton->findService(srvc_handle))
 			{
@@ -181,8 +185,7 @@ public:
 	static void service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			VM_BT_GATT_SERVICE_HANDLE srvc_handle)
 	{
-		// fix: check context matches, maybe lookup service for good measure
-		if (status == 0)
+		if (_singleton->contextValid(context_handle) && status == 0)
 		{
 			vm_bt_gatt_server_listen(context_handle, VM_TRUE);
 			vm_log_info("listening on service");
@@ -199,8 +202,7 @@ public:
 		// vm_bt_gatt_server_listen(conn->connection_handle, VM_FALSE);
 		// can determine service by conn->context_handle
 		// maybe invoke callback for listener
-		vm_log_info(
-				"connection_callback connected [%d] [0x%x, 0x%x] -s", connected, conn->context_handle, conn->connection_handle);
+		vm_log_info("connection_callback connected [%d] [0x%x, 0x%x] -s", connected, conn->context_handle, conn->connection_handle);
 	}
 	static void request_read_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
 			VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, VMUINT16 offset, VMBOOL is_long)
@@ -229,7 +231,6 @@ public:
 		}
 	}
 
-protected:
 	void setCallbacks()
 	{
 		_callbacks.register_server = register_server_callback;

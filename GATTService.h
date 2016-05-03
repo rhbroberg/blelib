@@ -39,19 +39,25 @@ public:
 		initializeInfo();
 	}
 
-	void serviceHandle(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
+	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 	{
 		_serviceHandle = handle;
+
+		// iterate over characteristics now, register each one
+		for (const auto & each : _byUUID)
+		{
+			vm_log_info("registering char of %s", each.second->uuid());
+			each.second->registerMe(_context, _serviceHandle);
+		}
 	}
 
 	void addCharacteristic(GATTCharacteristic *gattChar)
 	{
 		vm_log_info("adding char of %s", gattChar->uuid());
 		_byUUID[gattChar->uuid()] = gattChar;
-		gattChar->registerMe(_context, _serviceHandle);
 	}
 
-	GATTCharacteristic *findCharacteristic(	vm_bt_gatt_attribute_uuid_t *key)
+	GATTCharacteristic *findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
 	{
 		char tmpKey[32];
 
@@ -75,7 +81,7 @@ public:
 		return NULL;
 	}
 
-	void registerCharacteristic( vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle)
+	void registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 	{
     	GATTCharacteristic *tmp = findCharacteristic(key);
 
@@ -89,7 +95,7 @@ public:
 	void registerMe(void *context)
 	{
 		_context = context;
-        vm_log_info("adding service");
+        vm_log_info("adding service %x", &_serviceInfo);
 	    vm_bt_gatt_server_add_service(_context, &_serviceInfo, 10);
 	}
 

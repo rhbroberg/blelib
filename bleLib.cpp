@@ -137,6 +137,25 @@ vm_bt_gatt_server_callback_t g_gatts_cb;
 #include "GATTServer.h"
 
 GATTServer myServer(g_gatt_uuid);
+VMUINT8 myserviceUUID[] = { 0xFD, 0x36, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x01, 0xFE };
+GATTService myService(myserviceUUID, true);
+
+VMUINT8 myOtherServiceUUID[] = { 0xF0, 0x40, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x09, 0xFA };
+GATTService myOtherService(myOtherServiceUUID, true);
+
+GATTCharacteristic *myChar = NULL;
+GATTCharacteristic *c2 = NULL;
+
+GATTCharacteristic *s2c1 = NULL;
+GATTCharacteristic *s2c2 = NULL;
+
+const int myReadHook()
+{
+	static int foo = 13;
+
+	vm_log_info("in the readhook");
+	return foo++;
+}
 
 void gatts_callback_init(vm_bt_gatt_server_callback_t *gatts_cb)
 {
@@ -193,6 +212,44 @@ void gatt_init(void)
     }
 
 #else
+
+	VMUINT8 myUUID[] =
+	{ 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x00, 0xFF };
+	myChar = new GATTCharacteristic((VMUINT8 *) &myUUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+	std::function<const int()> myhook = [&] ()
+	{	return myReadHook();};
+	myChar->setReadHook(myhook);
+
+	myService.addCharacteristic(myChar);
+
+	VMUINT8 myc2UUID[] =
+	{ 0xFC, 0x35, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x02, 0xFD };
+	c2 = new GATTCharacteristic(myc2UUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+
+	myService.addCharacteristic(c2);
+
+	VMUINT8 mys2c12UUID[] =
+	{ 0xFC, 0x35, 0x9B, 0x5F, 0x90, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x01, 0x19, 0x2A, 0x02, 0xFD };
+	s2c1 = new GATTCharacteristic(mys2c12UUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+
+	myOtherService.addCharacteristic(s2c1);
+
+	VMUINT8 mys2c2UUID[] =
+	{ 0xFC, 0x35, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x02, 0xFD };
+	s2c2 = new GATTCharacteristic(mys2c2UUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+
+	myOtherService.addCharacteristic(s2c2);
+
+	myServer.addService(&myService);
+	myServer.addService(&myOtherService);
     myServer.enable();
 #endif
 

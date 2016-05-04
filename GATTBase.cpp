@@ -35,7 +35,7 @@ GATTBase::charToHex(const char c) const
 }
 
 void
-GATTBase::hexify(const char *in, VMUINT8 *out)
+GATTBase::hexify(const char *in, VMUINT8 *out) const
 {
 	for (unsigned int i = 0; i < strlen(in); i +=2 )
 	{
@@ -44,7 +44,7 @@ GATTBase::hexify(const char *in, VMUINT8 *out)
 }
 
 void
-GATTBase::stringify(const VMUINT8 *in, char *out)
+GATTBase::stringify(const VMUINT8 *in, char *out) const
 {
 	sprintf((VMSTR)out, (VMCSTR)"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			in[0], in[1], in[2], in[3],

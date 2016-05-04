@@ -143,18 +143,31 @@ GATTService myService(myserviceUUID, true);
 VMUINT8 myOtherServiceUUID[] = { 0xF0, 0x40, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x09, 0xFA };
 GATTService myOtherService(myOtherServiceUUID, true);
 
-GATTCharacteristic *myChar = NULL;
-GATTCharacteristic *c2 = NULL;
+#include "GATTLongCharacteristic.h"
+#include "GATTLongHookCharacteristic.h"
 
-GATTCharacteristic *s2c1 = NULL;
-GATTCharacteristic *s2c2 = NULL;
+long myValue;
 
-const int myReadHook()
+GATTLongHookCharacteristic *myChar = NULL;
+GATTLongCharacteristic *c2 = NULL;
+
+GATTLongCharacteristic *s2c1 = NULL;
+GATTLongCharacteristic *s2c2 = NULL;
+
+const long myReadHook()
 {
-	static int foo = 13;
+	static long foo = 13;
 
 	vm_log_info("in the readhook");
 	return foo++;
+}
+
+void myWriteHook(const long value)
+{
+	static long bar = 0;
+
+	vm_log_info("in the writehook writing %d", value);
+	bar = value;
 }
 
 void gatts_callback_init(vm_bt_gatt_server_callback_t *gatts_cb)
@@ -215,37 +228,41 @@ void gatt_init(void)
 
 	VMUINT8 myUUID[] =
 	{ 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x00, 0xFF };
-	myChar = new GATTCharacteristic((VMUINT8 *) &myUUID,
+	std::function<const long()> myReadhook = [&] () { return myReadHook();};
+	std::function<void(const long value)> myWritehook = [&] (const long value) { return myWriteHook(value); };
+
+	myChar = new GATTLongHookCharacteristic((VMUINT8 *) &myUUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
-	std::function<const int()> myhook = [&] ()
-	{	return myReadHook();};
-	myChar->setReadHook(myhook);
+	myChar->setReadHook(myReadHook);
+	myChar->setWriteHook(myWriteHook);
 
 	myService.addCharacteristic(myChar);
 
 	VMUINT8 myc2UUID[] =
 	{ 0xFC, 0x35, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x02, 0xFD };
-	c2 = new GATTCharacteristic(myc2UUID,
+	c2 = new GATTLongCharacteristic(myc2UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
-			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
-
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ, &myValue);
+	myValue = 42;
 	myService.addCharacteristic(c2);
 
 	VMUINT8 mys2c12UUID[] =
 	{ 0xFC, 0x35, 0x9B, 0x5F, 0x90, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x01, 0x19, 0x2A, 0x02, 0xFD };
-	s2c1 = new GATTCharacteristic(mys2c12UUID,
+	s2c1 = new GATTLongCharacteristic(mys2c12UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 
+	s2c1->setValue(4);
 	myOtherService.addCharacteristic(s2c1);
 
 	VMUINT8 mys2c2UUID[] =
 	{ 0xFC, 0x35, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x02, 0xFD };
-	s2c2 = new GATTCharacteristic(mys2c2UUID,
+	s2c2 = new GATTLongCharacteristic(mys2c2UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 
+	s2c2->setValue(5);
 	myOtherService.addCharacteristic(s2c2);
 
 	myServer.addService(&myService);
@@ -364,11 +381,6 @@ void gatts_register_server_cb(void *context_handle, VMBOOL status, VMUINT8 app_u
 	}
 }
 
-
-#ifdef NOPE
-GATTCharacteristic *myChar = NULL;
-GATTCharacteristic *c2 = NULL;
-#endif
 
 void gatts_add_service_cb(VMBOOL status, void *context_handle, vm_bt_gatt_service_info_t *srvc_id,
                           VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)

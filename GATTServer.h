@@ -27,14 +27,15 @@ public:
 	const bool enable();
 
 protected:
-	void registerServices();
-	GATTService *findService(const VMUINT8 *hex);
 
+	void registerServices();
+	GATTService *findService(const VMUINT8 *hex) const;
 	GATTService *findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
 
 	GATTCharacteristic *findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
-
 	const bool contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const;
+	void setCallbacks();
+	void start();
 
 	// static void callbacks go here
 	static void btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data);
@@ -58,9 +59,6 @@ protected:
 	static void request_write_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
 			VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, vm_bt_gatt_attribute_value_t *value, VMUINT16 offset,
 			VMBOOL need_rsp, VMBOOL is_prep);
-
-	void setCallbacks();
-	void start();
 
 	std::unordered_map<std::string, GATTService *> _services;
 	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, GATTService *> _byHandle;

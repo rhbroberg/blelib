@@ -54,7 +54,7 @@ GATTServer::registerServices()
 }
 
 GATTService *
-GATTServer::findService(const VMUINT8 *hex)
+GATTServer::findService(const VMUINT8 *hex) const
 {
 	char tmpKey[32];
 

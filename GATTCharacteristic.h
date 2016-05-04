@@ -23,36 +23,25 @@ class GATTCharacteristic : public GATTBase
 public:
 	GATTCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
 	GATTCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
+	virtual ~GATTCharacteristic();
 
-	void setReadHook(std::function<const int(void)> hook);
-	void setWriteHook(std::function<const int(void)> hook);
 	void readRequest(vm_bt_gatt_attribute_value_t *att_value, const VMUINT16 offset);
-
-	void registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle);
-
-	void onWrite(int value);
 	void writeRequest(const vm_bt_gatt_attribute_value_t *value);
 
-	const vm_bt_gatt_attribute_uuid_t *getAttribute() const;
-
+	void registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle);
 	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle);
 
 protected:
 	void initializeAttribute();
 
-	// would be pure virtual
-	const int read();
+	virtual const long onRead() = 0;
+	virtual void onWrite(long value) = 0;
 
 	vm_bt_gatt_attribute_uuid_t _attribute;
 	VM_BT_GATT_CHAR_PROPERTIES _properties;
 	VM_BT_GATT_PERMISSION _permission;
 	VM_BT_GATT_ATTRIBUTE_HANDLE _charHandle;
-	std::function<const int(void)> _readHook, _writeHook;
 	bool _isRegistered;
-
-	// do these need to be cached?
-	void *_context;
-	VM_BT_GATT_ATTRIBUTE_HANDLE _serviceHandle;
 };
 
 

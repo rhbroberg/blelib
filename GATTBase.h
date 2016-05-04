@@ -20,8 +20,8 @@ public:
 
 protected:
 	const VMUINT8 charToHex(const char c) const;
-	void hexify(const char *in, VMUINT8 *out);
-	void stringify(const VMUINT8 *in, char *out);
+	void hexify(const char *in, VMUINT8 *out) const;
+	void stringify(const VMUINT8 *in, char *out) const;
 	void initializeHexUUID();
 	void initializeCharUUID();
 

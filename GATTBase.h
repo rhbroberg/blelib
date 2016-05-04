@@ -18,6 +18,9 @@ public:
 	const char *uuid() const;
 	const VMUINT8 *hexUUID() const;
 
+	// utility class:
+	// firstUUID()
+	// nextUUID()
 protected:
 	const VMUINT8 charToHex(const char c) const;
 	void hexify(const char *in, VMUINT8 *out) const;

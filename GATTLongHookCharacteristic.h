@@ -2,19 +2,19 @@
 #define GATTLongHookCharacteristic_h
 
 #include <functional>
-#include "GATTCharacteristic.h"
+#include "GATTLongBaseCharacteristic.h"
 #include "vmlog.h"
 
-class GATTLongHookCharacteristic : public GATTCharacteristic
+class GATTLongHookCharacteristic : public GATTLongBaseCharacteristic
 {
 public:
 	GATTLongHookCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
-	 : 	GATTCharacteristic(uuid, properties, permission)
+	 : 	GATTLongBaseCharacteristic(uuid, properties, permission)
 	{
 	}
 
 	GATTLongHookCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
-	 : GATTCharacteristic(hex, properties, permission)
+	 : GATTLongBaseCharacteristic(hex, properties, permission)
 	 {
 	 }
 

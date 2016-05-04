@@ -145,6 +145,7 @@ GATTService myOtherService(myOtherServiceUUID, true);
 
 #include "GATTLongCharacteristic.h"
 #include "GATTLongHookCharacteristic.h"
+#include "GATTStringCharacteristic.h"
 
 long myValue;
 
@@ -153,6 +154,8 @@ GATTLongCharacteristic *c2 = NULL;
 
 GATTLongCharacteristic *s2c1 = NULL;
 GATTLongCharacteristic *s2c2 = NULL;
+
+GATTStringCharacteristic *s2c3 = NULL;
 
 const long myReadHook()
 {
@@ -264,6 +267,14 @@ void gatt_init(void)
 
 	s2c2->setValue(5);
 	myOtherService.addCharacteristic(s2c2);
+
+	VMUINT8 mys2c3UUID[] =
+	{ 0xFB, 0x34, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x03, 0xFC };
+	s2c3 = new GATTStringCharacteristic(mys2c3UUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+
+	myOtherService.addCharacteristic(s2c3);
 
 	myServer.addService(&myService);
 	myServer.addService(&myOtherService);

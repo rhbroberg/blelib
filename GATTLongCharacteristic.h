@@ -1,14 +1,14 @@
 #ifndef GATTLongCharacteristic_h
 #define GATTLongCharacteristic_h
 
-#include "GATTCharacteristic.h"
+#include "GATTLongBaseCharacteristic.h"
 #include "vmlog.h"
 
-class GATTLongCharacteristic : public GATTCharacteristic
+class GATTLongCharacteristic : public GATTLongBaseCharacteristic
 {
 public:
 	GATTLongCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL)
-	 : 	GATTCharacteristic(uuid, properties, permission)
+	 : 	GATTLongBaseCharacteristic(uuid, properties, permission)
 	, _updated(false)
 	, _value(storage)
 	, _own(false)
@@ -17,7 +17,7 @@ public:
 	}
 
 	GATTLongCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL)
-	 : GATTCharacteristic(hex, properties, permission)
+	 : GATTLongBaseCharacteristic(hex, properties, permission)
 	 , _updated(false)
 	 , _value(storage)
 	 , _own(false)

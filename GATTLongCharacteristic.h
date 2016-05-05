@@ -2,76 +2,24 @@
 #define GATTLongCharacteristic_h
 
 #include "GATTLongBaseCharacteristic.h"
-#include "vmlog.h"
 
 class GATTLongCharacteristic : public GATTLongBaseCharacteristic
 {
 public:
-	GATTLongCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL)
-	 : 	GATTLongBaseCharacteristic(uuid, properties, permission)
-	, _updated(false)
-	, _value(storage)
-	, _own(false)
-	{
-		initialize();
-	}
+	GATTLongCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL);
+	GATTLongCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL);
 
-	GATTLongCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, long *storage = NULL)
-	 : GATTLongBaseCharacteristic(hex, properties, permission)
-	 , _updated(false)
-	 , _value(storage)
-	 , _own(false)
-	 {
-		initialize();
-	 }
+	virtual ~GATTLongCharacteristic();
 
-	virtual ~GATTLongCharacteristic()
-	{
-		if (_own)
-		{
-			delete _value;
-		}
-	}
-
-	void setValue(const long value)
-	{
-		*_value = value;
-	}
-
-	const long getValue() const
-	{
-		_updated = false;
-		return *_value;
-	}
-
-	const bool updated() const
-	{
-		return _updated;
-	}
+	void setValue(const long value);
+	const long getValue() const;
+	const bool updated() const;
 
 protected:
 
-	void initialize()
-	{
-		if (! _value)
-		{
-			_own = true;
-			_value = new long;
-			*_value = 0;
-		}
-	}
-
-	virtual const long onRead()
-	{
-		return getValue();
-	}
-
-	virtual void onWrite(long value)
-	{
-		_updated = true;
-		setValue(value);
-		vm_log_info("wrote value %d", *_value);
-	}
+	void initialize();
+	virtual const long onRead();
+	virtual void onWrite(long value);
 
 	long *_value;
 	bool _own;

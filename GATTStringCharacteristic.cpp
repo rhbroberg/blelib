@@ -1,8 +1,6 @@
 #include "GATTStringCharacteristic.h"
 #include "vmlog.h"
 
-#define STRING_MAX_SIZE 128
-
 GATTStringCharacteristic::GATTStringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
 : GATTCharacteristic(uuid, properties, permission)
 , _string(str)
@@ -30,7 +28,11 @@ GATTStringCharacteristic::~GATTStringCharacteristic()
 void
 GATTStringCharacteristic::setValue(const char *str)
 {
-	memcpy(_string, str, strlen(str));
+	if (strlen(str) < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
+	{
+		memcpy(_string, str, strlen(str));
+	}
+	// fix: status value return
 }
 
 const char *
@@ -60,13 +62,13 @@ GATTStringCharacteristic::initialize()
 {
 	if (! _string)
 	{
-		_string = new char[STRING_MAX_SIZE];
+		_string = new char[VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH];
 		_own = true;
 	}
 }
 
 const char *
-GATTStringCharacteristic::onRead() //= 0;
+GATTStringCharacteristic::onRead()
 {
 	static const char *foo = "abc 123 do ray me";
 
@@ -77,7 +79,7 @@ GATTStringCharacteristic::onRead() //= 0;
 void
 GATTStringCharacteristic::onWrite(const char *value, const unsigned length) //= 0;
 {
-	static char localString[STRING_MAX_SIZE];
+	static char localString[VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH];
 	memcpy(localString, value, length);
 	localString[length] = 0;
 

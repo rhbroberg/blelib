@@ -3,18 +3,16 @@
 
 #include <unordered_map>
 #include <string>
+#include "vmbt_cm.h"
 
 #include "GATTService.h"
 
 class GATTServer: public GATTBase
 {
 public:
-	static GATTServer *_singleton;
-
 	GATTServer(VMUINT8 *hex);
 
 	void addService(GATTService *service);
-
 	const bool enable();
 
 protected:
@@ -56,6 +54,7 @@ protected:
 	VMINT _handle;
 	void *_context;
 	vm_bt_gatt_server_callback_t _callbacks;
+	static GATTServer *_singleton;
 };
 
 #endif // GATTServer_h

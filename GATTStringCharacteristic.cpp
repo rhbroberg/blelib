@@ -1,5 +1,9 @@
 #include "GATTStringCharacteristic.h"
 #include "vmlog.h"
+#include "vmmemory.h"
+#include "vmlog.h"
+#include "string.h"
+#include "vmstdlib.h"
 
 GATTStringCharacteristic::GATTStringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
 : GATTCharacteristic(uuid, properties, permission)

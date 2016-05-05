@@ -2,6 +2,7 @@
 #define GATTCharacteristic_h
 
 #include "GATTBase.h"
+#include "vmbt_gatt.h"
 
 class GATTCharacteristic : public GATTBase
 {

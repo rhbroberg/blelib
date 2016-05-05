@@ -1,4 +1,9 @@
 #include "GATTService.h"
+#include "vmlog.h"
+#include "vmmemory.h"
+#include "vmlog.h"
+#include "string.h"
+#include "vmstdlib.h"
 
 GATTService::GATTService(const char *uuid, const bool primary)
 : _serviceHandle(0)

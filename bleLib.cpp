@@ -1,21 +1,12 @@
 #include "vmtype.h" 
 #include "vmboard.h"
 #include "vmsystem.h"
-#include "vmlog.h" 
-#include "vmcmd.h" 
-#include "vmdcl.h"
-#include "vmdcl_gpio.h"
-#include "vmthread.h"
 #include "vmres.h"
 #include "vmmemory.h"
-#include "string.h"
-#include "vmpwr.h"
-
-#include "bleLib.h"
-
 #include "vmstdlib.h"
 #include "vmlog.h"
-#include "vmfs.h"
+
+#include "bleLib.h"
 
 #include "GATTServer.h"
 #include "GATTLongCharacteristic.h"

@@ -2,13 +2,6 @@
 #define GATTBase_h
 
 #include "vmtype.h"
-#include "vmmemory.h"
-#include "string.h"
-#include "vmstdlib.h"
-#include "vmlog.h"
-
-#include "vmbt_gatt.h"
-#include "vmbt_cm.h"
 
 class GATTBase
 {

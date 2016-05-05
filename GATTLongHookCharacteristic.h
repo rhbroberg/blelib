@@ -1,8 +1,8 @@
 #ifndef GATTLongHookCharacteristic_h
 #define GATTLongHookCharacteristic_h
 
-#include <functional>
 #include "GATTLongBaseCharacteristic.h"
+#include <functional>
 
 class GATTLongHookCharacteristic : public GATTLongBaseCharacteristic
 {

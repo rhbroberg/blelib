@@ -7,7 +7,7 @@
 
 GATTServer *GATTServer::_singleton;
 
-GATTServer::GATTServer(VMUINT8 *hex)
+GATTServer::GATTServer(VMUINT8 *hex, const char *name)
 : _handle(0)
 , _context(NULL)
 {
@@ -15,6 +15,18 @@ GATTServer::GATTServer(VMUINT8 *hex)
 	initializeCharUUID();
 	setCallbacks();
 	_singleton = this;
+
+	if (name)
+	{
+		vm_bt_cm_set_host_name((VMUINT8 *)name);
+	}
+}
+
+void
+GATTServer::changeName(const char *name)
+{
+	vm_bt_cm_set_host_name((VMUINT8 *)name);
+	// fix: probably have to bounce btcm here
 }
 
 void

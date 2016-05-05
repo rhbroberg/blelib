@@ -12,9 +12,10 @@
 #include "GATTLongCharacteristic.h"
 #include "GATTLongHookCharacteristic.h"
 #include "GATTStringCharacteristic.h"
+#include "GATTStringHookCharacteristic.h"
 
 VMUINT8 g_gatt_uuid[] = { 0x19, 0xA0, 0x1F, 0x49, 0xFF, 0xE5, 0x40, 0x56, 0x84, 0x5B, 0x6D, 0xF1, 0xF1, 0xB1, 0x6E, 0x9D };
-GATTServer myServer(g_gatt_uuid);
+GATTServer myServer(g_gatt_uuid, "bleTest");
 
 VMUINT8 myserviceUUID[] = { 0xFD, 0x36, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x01, 0xFE };
 GATTService myService(myserviceUUID, true);
@@ -29,6 +30,7 @@ GATTLongCharacteristic *c2 = NULL;
 GATTLongCharacteristic *s2c1 = NULL;
 GATTLongCharacteristic *s2c2 = NULL;
 GATTStringCharacteristic *s2c3 = NULL;
+GATTStringHookCharacteristic *s2c4 = NULL;
 
 const long myReadHook()
 {
@@ -44,6 +46,20 @@ void myWriteHook(const long value)
 
 	vm_log_info("in the writehook writing %d", value);
 	bar = value;
+}
+
+#include <string.h>
+#include <vmmemory.h>
+
+void updateBLEName(const char *name, const unsigned length)
+{
+	static char localName[32];
+
+	memcpy(localName, name, length < 32 ? length : 31);
+	localName[32] = 0;
+
+	vm_log_info("changing name to %s", localName);
+	myServer.changeName(localName);
 }
 
 void testme(void)
@@ -85,6 +101,13 @@ void testme(void)
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 	myOtherService.addCharacteristic(s2c3);
+
+	VMUINT8 mys2c4UUID[] = { 0xFA, 0x33, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x04, 0xFB };
+	s2c4 = new GATTStringHookCharacteristic(mys2c4UUID,
+			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
+			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+	myOtherService.addCharacteristic(s2c4);
+	s2c4->setWriteHook(updateBLEName);
 
 	myServer.addService(&myService);
 	myServer.addService(&myOtherService);

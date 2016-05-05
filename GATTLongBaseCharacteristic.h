@@ -13,9 +13,9 @@ public:
 	virtual void writeRequest(const vm_bt_gatt_attribute_value_t *att_value);
 
 protected:
-	void initialize();
+
 	virtual const long onRead() = 0;
-	virtual void onWrite(long value) = 0;
+	virtual void onWrite(const long value) = 0;
 };
 
 #endif //  GATTLongBaseCharacteristic_h

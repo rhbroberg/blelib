@@ -64,7 +64,7 @@ GATTLongCharacteristic::onRead()
 }
 
 void
-GATTLongCharacteristic::onWrite(long value)
+GATTLongCharacteristic::onWrite(const long value)
 {
 	_updated = true;
 	setValue(value);

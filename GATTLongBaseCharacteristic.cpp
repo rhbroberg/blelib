@@ -34,9 +34,3 @@ GATTLongBaseCharacteristic::writeRequest(const vm_bt_gatt_attribute_value_t *att
 
 	onWrite(value);
 }
-
-void
-GATTLongBaseCharacteristic::initialize()
-{
-
-}

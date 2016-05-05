@@ -30,7 +30,7 @@ GATTLongHookCharacteristic::onRead()
 }
 
 void
-GATTLongHookCharacteristic::onWrite(long value)
+GATTLongHookCharacteristic::onWrite(const long value)
 {
 	if (_writeHook)
 	{

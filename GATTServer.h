@@ -10,10 +10,11 @@
 class GATTServer: public GATTBase
 {
 public:
-	GATTServer(VMUINT8 *hex);
+	GATTServer(VMUINT8 *hex, const char *name = NULL);
 
 	void addService(GATTService *service);
 	const bool enable();
+	void changeName(const char *name);
 
 protected:
 

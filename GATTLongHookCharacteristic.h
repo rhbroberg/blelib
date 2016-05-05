@@ -16,7 +16,7 @@ public:
 protected:
 
 	virtual const long onRead();
-	virtual void onWrite(long value);
+	virtual void onWrite(const long value);
 
 	std::function<const long(void)> _readHook;
 	std::function<void(const long)> _writeHook;

@@ -6,7 +6,7 @@
 #include "vmstdlib.h"
 
 GATTStringCharacteristic::GATTStringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
-: GATTCharacteristic(uuid, properties, permission)
+: GATTStringBaseCharacteristic(uuid, properties, permission)
 , _string(str)
 , _own(false)
 {
@@ -14,7 +14,7 @@ GATTStringCharacteristic::GATTStringCharacteristic(const char *uuid, VM_BT_GATT_
 }
 
 GATTStringCharacteristic::GATTStringCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
-: GATTCharacteristic(hex, properties, permission)
+: GATTStringBaseCharacteristic(hex, properties, permission)
 , _string(str)
 , _own(false)
 {
@@ -36,29 +36,13 @@ GATTStringCharacteristic::setValue(const char *str)
 	{
 		memcpy(_string, str, strlen(str));
 	}
-	// fix: status value return
+	// fix: status value return if too big?
 }
 
 const char *
 GATTStringCharacteristic::getValue() const
 {
 	return _string;
-}
-
-void
-GATTStringCharacteristic::readRequest(vm_bt_gatt_attribute_value_t *att_value, const VMUINT16 offset)
-{
-	const char *value = onRead();
-
-	vm_log_info("read object %s", value);
-	memcpy(&(att_value->data[offset]), value, strlen(value));
-	att_value->length = strlen(value);
-}
-
-void
-GATTStringCharacteristic::writeRequest(const vm_bt_gatt_attribute_value_t *value)
-{
-	onWrite((const char *)value->data, value->length);
 }
 
 void

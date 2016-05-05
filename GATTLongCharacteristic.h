@@ -19,7 +19,7 @@ protected:
 
 	void initialize();
 	virtual const long onRead();
-	virtual void onWrite(long value);
+	virtual void onWrite(const long value);
 
 	long *_value;
 	bool _own;

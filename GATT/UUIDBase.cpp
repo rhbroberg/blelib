@@ -12,6 +12,23 @@ UUIDBase::UUIDBase()
 {
 }
 
+UUIDBase::UUIDBase(const char *uuid)
+{
+	memcpy(_uuid, uuid, 32);
+	initializeHexUUID();
+}
+
+UUIDBase::UUIDBase(VMUINT8 *hex)
+{
+	memcpy(_hexUUID, hex, sizeof(_hexUUID));
+	initializeCharUUID();
+}
+
+UUIDBase::~UUIDBase()
+{
+
+}
+
 const char *
 UUIDBase::uuid() const
 {

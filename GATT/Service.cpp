@@ -9,22 +9,20 @@
 using namespace gatt;
 
 Service::Service(const char *uuid, const bool primary)
-: _serviceHandle(0)
+: UUIDBase(uuid)
+, _serviceHandle(0)
 , _primary(primary)
 , _started(false)
 {
-	memcpy(&_uuid, uuid, 16);
-	initializeHexUUID();
 	initializeInfo();
 }
 
 Service::Service(VMUINT8 *hex, const bool primary)
-: _serviceHandle(0)
+: UUIDBase(hex)
+, _serviceHandle(0)
 , _primary(primary)
 , _started(false)
 {
-	memcpy(_hexUUID, hex, sizeof(_hexUUID));
-	initializeCharUUID();
 	initializeInfo();
 }
 

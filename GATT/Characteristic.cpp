@@ -7,30 +7,23 @@
 using namespace gatt;
 
 Characteristic::Characteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
- : _properties(properties)
+ : UUIDBase(uuid)
+, _properties(properties)
 , _permission(permission)
 , _isRegistered(false)
 , _charHandle(0)
 {
-	memcpy(_uuid, uuid, 32);
-	initializeHexUUID();
 	initializeAttribute();
 }
 
 Characteristic::Characteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
- : _properties(properties)
+ : UUIDBase(hex)
+, _properties(properties)
 , _permission(permission)
 , _isRegistered(false)
 , _charHandle(0)
 {
-	memcpy(_hexUUID, hex, sizeof(_hexUUID));
-	initializeCharUUID();
 	initializeAttribute();
-}
-
-Characteristic::~Characteristic()
-{
-
 }
 
 void

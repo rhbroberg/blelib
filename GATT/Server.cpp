@@ -11,11 +11,10 @@ using namespace gatt;
 Server *Server::_singleton;
 
 Server::Server(VMUINT8 *hex, const char *name)
-: _handle(0)
+: UUIDBase(hex)
+, _handle(0)
 , _context(NULL)
 {
-	memcpy(_hexUUID, hex, sizeof(_hexUUID));
-	initializeCharUUID();
 	setCallbacks();
 	_singleton = this;
 

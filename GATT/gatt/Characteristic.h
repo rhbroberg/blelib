@@ -11,7 +11,6 @@ class Characteristic : public UUIDBase
 public:
 	Characteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
 	Characteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
-	virtual ~Characteristic();
 
 	void registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle);
 	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle);

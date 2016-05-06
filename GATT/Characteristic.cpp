@@ -1,4 +1,4 @@
-#include "Characteristic.h"
+#include "gatt/Characteristic.h"
 #include "vmmemory.h"
 #include "string.h"
 #include "vmstdlib.h"

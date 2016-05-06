@@ -10,11 +10,11 @@
 
 #include "bleLib.h"
 
-#include "Server.h"
-#include "LongCharacteristic.h"
-#include "LongHookCharacteristic.h"
-#include "StringCharacteristic.h"
-#include "StringHookCharacteristic.h"
+#include "gatt/Server.h"
+#include "gatt/LongCharacteristic.h"
+#include "gatt/LongHookCharacteristic.h"
+#include "gatt/StringCharacteristic.h"
+#include "gatt/StringHookCharacteristic.h"
 
 using namespace gatt;
 

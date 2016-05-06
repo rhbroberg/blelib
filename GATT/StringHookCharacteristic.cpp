@@ -1,5 +1,6 @@
-#include "StringHookCharacteristic.h"
 #include "vmlog.h"
+
+#include "gatt/StringHookCharacteristic.h"
 
 using namespace gatt;
 

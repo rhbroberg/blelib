@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UUIDBase.h"
+#include "gatt/UUIDBase.h"
 #include "vmbt_gatt.h"
 
 namespace gatt

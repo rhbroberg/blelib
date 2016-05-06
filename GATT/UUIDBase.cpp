@@ -1,9 +1,10 @@
-#include "UUIDBase.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
+
+#include "gatt/UUIDBase.h"
 
 using namespace gatt;
 

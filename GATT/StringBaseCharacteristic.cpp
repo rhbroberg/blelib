@@ -1,9 +1,10 @@
-#include "StringBaseCharacteristic.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
+
+#include "gatt/StringBaseCharacteristic.h"
 
 using namespace gatt;
 

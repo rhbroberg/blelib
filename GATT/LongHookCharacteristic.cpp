@@ -1,4 +1,4 @@
-#include "LongHookCharacteristic.h"
+#include "gatt/LongHookCharacteristic.h"
 #include "vmlog.h"
 
 using namespace gatt;

@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "Characteristic.h"
+#include "gatt/Characteristic.h"
 
 namespace gatt
 {

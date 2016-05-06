@@ -4,7 +4,8 @@
 #include <string>
 #include "vmbt_cm.h"
 
-#include "Service.h"
+#include "gatt/UUIDBase.h"
+#include "gatt/Service.h"
 
 namespace gatt
 {

@@ -1,9 +1,10 @@
-#include "Service.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
+
+#include "gatt/Service.h"
 
 using namespace gatt;
 

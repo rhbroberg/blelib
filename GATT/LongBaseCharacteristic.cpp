@@ -1,4 +1,4 @@
-#include "LongBaseCharacteristic.h"
+#include "gatt/LongBaseCharacteristic.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"

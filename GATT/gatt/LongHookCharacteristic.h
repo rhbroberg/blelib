@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LongBaseCharacteristic.h"
+#include "gatt/LongBaseCharacteristic.h"
 #include <functional>
 
 namespace gatt

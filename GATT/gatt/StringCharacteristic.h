@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StringBaseCharacteristic.h"
+#include "gatt/StringBaseCharacteristic.h"
 
 namespace gatt
 {

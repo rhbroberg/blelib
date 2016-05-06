@@ -1,12 +1,14 @@
-#ifndef GATTBase_h
-#define GATTBase_h
+#pragma once
 
 #include "vmtype.h"
 
-class GATTBase
+namespace gatt
+{
+
+class UUIDBase
 {
 public:
-	GATTBase();
+	UUIDBase();
 
 	const char *uuid() const;
 	const VMUINT8 *hexUUID() const;
@@ -25,4 +27,4 @@ protected:
 	VMUINT8 _hexUUID[16];
 };
 
-#endif // GATTBase_h
+}

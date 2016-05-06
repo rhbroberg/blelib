@@ -1,13 +1,15 @@
-#include "GATTServer.h"
+#include "Server.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
 
-GATTServer *GATTServer::_singleton;
+using namespace gatt;
 
-GATTServer::GATTServer(VMUINT8 *hex, const char *name)
+Server *Server::_singleton;
+
+Server::Server(VMUINT8 *hex, const char *name)
 : _handle(0)
 , _context(NULL)
 {
@@ -23,20 +25,20 @@ GATTServer::GATTServer(VMUINT8 *hex, const char *name)
 }
 
 void
-GATTServer::changeName(const char *name)
+Server::changeName(const char *name)
 {
 	vm_bt_cm_set_host_name((VMUINT8 *)name);
 	// fix: probably have to bounce btcm here
 }
 
 void
-GATTServer::addService(GATTService *service)
+Server::addService(Service *service)
 {
 	_services[service->uuid()] = service;
 }
 
 const bool
-GATTServer::enable()
+Server::enable()
 {
 	if ((_handle = vm_bt_cm_init(btcm_callback, VM_BT_CM_EVENT_BLE_ACTIVATE | VM_BT_CM_EVENT_DEACTIVATE, this)) < 0)
 	{
@@ -62,7 +64,7 @@ GATTServer::enable()
 }
 
 void
-GATTServer::registerServices()
+Server::registerServices()
 {
 	for (const auto & each : _services)
 	{
@@ -70,8 +72,8 @@ GATTServer::registerServices()
 	}
 }
 
-GATTService *
-GATTServer::findService(const VMUINT8 *hex) const
+Service *
+Server::findService(const VMUINT8 *hex) const
 {
 	char tmpKey[32];
 
@@ -85,8 +87,8 @@ GATTServer::findService(const VMUINT8 *hex) const
 	return NULL;
 }
 
-GATTService *
-GATTServer::findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
+Service *
+Server::findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
 {
 	auto search = _byHandle.find(key);
 	if (search != _byHandle.end())
@@ -96,10 +98,10 @@ GATTServer::findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
 	return NULL;
 }
 
-GATTCharacteristic *
-GATTServer::findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
+Characteristic *
+Server::findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
 {
-	GATTCharacteristic *activeChar = NULL;
+	Characteristic *activeChar = NULL;
 
 	// iterate over services, search in each one
 	for (const auto & each : _byHandle)
@@ -113,7 +115,7 @@ GATTServer::findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
 }
 
 const bool
-GATTServer::contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const
+Server::contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const
 {
 	return context == _context;
 }
@@ -121,7 +123,7 @@ GATTServer::contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const
 // static void callbacks go here
 // static
 void
-GATTServer::btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data)
+Server::btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data)
 {
 	vm_log_info("btcm_callback");
 
@@ -130,7 +132,7 @@ GATTServer::btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data)
 	case VM_BT_CM_EVENT_BLE_ACTIVATE:
 	{
 		vm_log_info("btcm_callback activate");
-		((GATTServer *) user_data)->start();
+		((Server *) user_data)->start();
 		break;
 	}
 	case VM_BT_CM_EVENT_DEACTIVATE:
@@ -147,7 +149,7 @@ GATTServer::btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data)
 
 // static
 void
-GATTServer::register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status, VMUINT8 *app_uuid)
+Server::register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status, VMUINT8 *app_uuid)
 {
 	// is it necessary to check if uuid matches server uuid?
 	_singleton->_context = context_handle;
@@ -161,14 +163,14 @@ GATTServer::register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, V
 
 // static
 void
-GATTServer::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
+Server::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		vm_bt_gatt_service_info_t *srvc_id, VM_BT_GATT_SERVICE_HANDLE srvc_handle)
 {
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
 		vm_log_info("rhb service add callback adding characteristics");
 
-		if (GATTService *activeService = _singleton->findService(srvc_id->uuid.uuid.uuid))
+		if (Service *activeService = _singleton->findService(srvc_id->uuid.uuid.uuid))
 		{
 			activeService->registered(srvc_handle);
 			_singleton->_byHandle[srvc_handle] = activeService;
@@ -178,13 +180,13 @@ GATTServer::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE cont
 
 // static
 void
-GATTServer::characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
+Server::characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 		VM_BT_GATT_CHARACTERISTIC_HANDLE char_handle)
 {
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
-		if (GATTService *activeService = _singleton->findService(srvc_handle))
+		if (Service *activeService = _singleton->findService(srvc_handle))
 		{
 			activeService->registerCharacteristic(uuid, char_handle);
 			activeService->start(context_handle, srvc_handle);
@@ -194,7 +196,7 @@ GATTServer::characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HAND
 
 // static
 void
-GATTServer::descriptor_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
+Server::descriptor_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 		VM_BT_GATT_DESCRIPTOR_HANDLE descr_handle)
 {
@@ -203,7 +205,7 @@ GATTServer::descriptor_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE c
 
 // static
 void
-GATTServer::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
+Server::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		VM_BT_GATT_SERVICE_HANDLE srvc_handle)
 {
 	if (_singleton->contextValid(context_handle) && status == 0)
@@ -215,14 +217,14 @@ GATTServer::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE co
 
 // static
 void
-GATTServer::listen_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status)
+Server::listen_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status)
 {
 	vm_log_info("listen_callback");
 }
 
 // static
 void
-GATTServer::connection_callback(const vm_bt_gatt_connection_t *conn, VMBOOL connected,
+Server::connection_callback(const vm_bt_gatt_connection_t *conn, VMBOOL connected,
 		const vm_bt_gatt_address_t *bd_addr)
 {
 	// maybe invoke callback for listener
@@ -231,11 +233,11 @@ GATTServer::connection_callback(const vm_bt_gatt_connection_t *conn, VMBOOL conn
 
 // static
 void
-GATTServer::request_read_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
+Server::request_read_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
 		VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, VMUINT16 offset, VMBOOL is_long)
 {
-	// find appropriate GATTCharacteristic in service to invoke method
-	if (GATTCharacteristic *activeChar = _singleton->findCharacteristic(attr_handle))
+	// find appropriate Characteristic in service to invoke method
+	if (Characteristic *activeChar = _singleton->findCharacteristic(attr_handle))
 	{
 		vm_bt_gatt_attribute_value_t att_value;
 
@@ -246,11 +248,11 @@ GATTServer::request_read_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_
 
 // static
 void
-GATTServer::request_write_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
+Server::request_write_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans_id, vm_bt_gatt_address_t *bd_addr,
 		VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, vm_bt_gatt_attribute_value_t *value, VMUINT16 offset,
 		VMBOOL need_rsp, VMBOOL is_prep)
 {
-	if (GATTCharacteristic *activeChar = _singleton->findCharacteristic(attr_handle))
+	if (Characteristic *activeChar = _singleton->findCharacteristic(attr_handle))
 	{
 		activeChar->writeRequest(value);
 
@@ -262,7 +264,7 @@ GATTServer::request_write_callback(vm_bt_gatt_connection_t *conn, VMUINT16 trans
 }
 
 void
-GATTServer::setCallbacks()
+Server::setCallbacks()
 {
 	_callbacks.register_server = register_server_callback;
 	_callbacks.service_added = service_added_callback;
@@ -285,7 +287,7 @@ GATTServer::setCallbacks()
 }
 
 void
-GATTServer::start()
+Server::start()
 {
 	vm_bt_gatt_server_register(_hexUUID, &_callbacks);
 	vm_log_debug("starting server %s", uuid());

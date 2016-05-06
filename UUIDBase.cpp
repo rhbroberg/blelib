@@ -1,28 +1,30 @@
-#include "GATTBase.h"
+#include "UUIDBase.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
 
-GATTBase::GATTBase()
+using namespace gatt;
+
+UUIDBase::UUIDBase()
 {
 }
 
 const char *
-GATTBase::uuid() const
+UUIDBase::uuid() const
 {
 	return _uuid;
 }
 
 const VMUINT8 *
-GATTBase::hexUUID() const
+UUIDBase::hexUUID() const
 {
 	return _hexUUID;
 }
 
 const VMUINT8
-GATTBase::charToHex(const char c) const
+UUIDBase::charToHex(const char c) const
 {
 	if ((c >= 'a') && (c <= 'f'))
 	{
@@ -40,7 +42,7 @@ GATTBase::charToHex(const char c) const
 }
 
 void
-GATTBase::hexify(const char *in, VMUINT8 *out) const
+UUIDBase::hexify(const char *in, VMUINT8 *out) const
 {
 	for (unsigned int i = 0; i < strlen(in); i +=2 )
 	{
@@ -49,7 +51,7 @@ GATTBase::hexify(const char *in, VMUINT8 *out) const
 }
 
 void
-GATTBase::stringify(const VMUINT8 *in, char *out) const
+UUIDBase::stringify(const VMUINT8 *in, char *out) const
 {
 	sprintf((VMSTR)out, (VMCSTR)"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			in[0], in[1], in[2], in[3],
@@ -60,17 +62,17 @@ GATTBase::stringify(const VMUINT8 *in, char *out) const
 }
 
 void
-GATTBase::initializeHexUUID()
+UUIDBase::initializeHexUUID()
 {
 	_uuid[32] = 0;
 
 	hexify(_uuid, _hexUUID);
-	vm_log_info("GATTBase: %s", _uuid);
+	vm_log_info("UUIDBase: %s", _uuid);
 }
 
 void
-GATTBase::initializeCharUUID()
+UUIDBase::initializeCharUUID()
 {
 	stringify(_hexUUID, _uuid);
-	vm_log_info("GATTBase hex is %s", _uuid);
+	vm_log_info("UUIDBase hex is %s", _uuid);
 }

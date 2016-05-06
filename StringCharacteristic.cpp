@@ -1,27 +1,29 @@
-#include "GATTStringCharacteristic.h"
+#include "StringCharacteristic.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
 
-GATTStringCharacteristic::GATTStringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
-: GATTStringBaseCharacteristic(uuid, properties, permission)
+using namespace gatt;
+
+StringCharacteristic::StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+: StringBaseCharacteristic(uuid, properties, permission)
 , _string(str)
 , _own(false)
 {
 	initialize();
 }
 
-GATTStringCharacteristic::GATTStringCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
-: GATTStringBaseCharacteristic(hex, properties, permission)
+StringCharacteristic::StringCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+: StringBaseCharacteristic(hex, properties, permission)
 , _string(str)
 , _own(false)
 {
 	initialize();
 }
 
-GATTStringCharacteristic::~GATTStringCharacteristic()
+StringCharacteristic::~StringCharacteristic()
 {
 	if (_own)
 	{
@@ -30,7 +32,7 @@ GATTStringCharacteristic::~GATTStringCharacteristic()
 }
 
 void
-GATTStringCharacteristic::setValue(const char *str)
+StringCharacteristic::setValue(const char *str)
 {
 	if (strlen(str) < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
 	{
@@ -40,13 +42,13 @@ GATTStringCharacteristic::setValue(const char *str)
 }
 
 const char *
-GATTStringCharacteristic::getValue() const
+StringCharacteristic::getValue() const
 {
 	return _string;
 }
 
 void
-GATTStringCharacteristic::initialize()
+StringCharacteristic::initialize()
 {
 	if (! _string)
 	{
@@ -56,7 +58,7 @@ GATTStringCharacteristic::initialize()
 }
 
 const char *
-GATTStringCharacteristic::onRead()
+StringCharacteristic::onRead()
 {
 	static const char *foo = "abc 123 do ray me";
 
@@ -65,7 +67,7 @@ GATTStringCharacteristic::onRead()
 }
 
 void
-GATTStringCharacteristic::onWrite(const char *value, const unsigned length) //= 0;
+StringCharacteristic::onWrite(const char *value, const unsigned length) //= 0;
 {
 	static char localString[VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH];
 	memcpy(localString, value, length);

@@ -1,28 +1,30 @@
-#ifndef GATTServer_h
-#define GATTServer_h
+#pragma once
 
 #include <unordered_map>
 #include <string>
 #include "vmbt_cm.h"
 
-#include "GATTService.h"
+#include "Service.h"
 
-class GATTServer: public GATTBase
+namespace gatt
+{
+
+class Server: public UUIDBase
 {
 public:
-	GATTServer(VMUINT8 *hex, const char *name = NULL);
+	Server(VMUINT8 *hex, const char *name = NULL);
 
-	void addService(GATTService *service);
+	void addService(Service *service);
 	const bool enable();
 	void changeName(const char *name);
 
 protected:
 
 	void registerServices();
-	GATTService *findService(const VMUINT8 *hex) const;
-	GATTService *findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
+	Service *findService(const VMUINT8 *hex) const;
+	Service *findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
 
-	GATTCharacteristic *findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
+	Characteristic *findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
 	const bool contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const;
 	void setCallbacks();
 	void start();
@@ -50,12 +52,12 @@ protected:
 			VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, vm_bt_gatt_attribute_value_t *value, VMUINT16 offset,
 			VMBOOL need_rsp, VMBOOL is_prep);
 
-	std::unordered_map<std::string, GATTService *> _services;
-	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, GATTService *> _byHandle;
+	std::unordered_map<std::string, Service *> _services;
+	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
 	VMINT _handle;
 	void *_context;
 	vm_bt_gatt_server_callback_t _callbacks;
-	static GATTServer *_singleton;
+	static Server *_singleton;
 };
 
-#endif // GATTServer_h
+}

@@ -1,11 +1,13 @@
-#include "GATTService.h"
+#include "Service.h"
 #include "vmlog.h"
 #include "vmmemory.h"
 #include "vmlog.h"
 #include "string.h"
 #include "vmstdlib.h"
 
-GATTService::GATTService(const char *uuid, const bool primary)
+using namespace gatt;
+
+Service::Service(const char *uuid, const bool primary)
 : _serviceHandle(0)
 , _primary(primary)
 , _started(false)
@@ -15,7 +17,7 @@ GATTService::GATTService(const char *uuid, const bool primary)
 	initializeInfo();
 }
 
-GATTService::GATTService(VMUINT8 *hex, const bool primary)
+Service::Service(VMUINT8 *hex, const bool primary)
 : _serviceHandle(0)
 , _primary(primary)
 , _started(false)
@@ -26,7 +28,7 @@ GATTService::GATTService(VMUINT8 *hex, const bool primary)
 }
 
 void
-GATTService::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
+Service::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 {
 	_serviceHandle = handle;
 
@@ -39,14 +41,14 @@ GATTService::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 }
 
 void
-GATTService::addCharacteristic(GATTCharacteristic *gattChar)
+Service::addCharacteristic(Characteristic *gattChar)
 {
 	vm_log_info("adding char of %s", gattChar->uuid());
 	_byUUID[gattChar->uuid()] = gattChar;
 }
 
-GATTCharacteristic *
-GATTService::findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
+Characteristic *
+Service::findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
 {
 	char tmpKey[32];
 
@@ -60,8 +62,8 @@ GATTService::findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
 	return NULL;
 }
 
-GATTCharacteristic *
-GATTService::find(VM_BT_GATT_ATTRIBUTE_HANDLE key)
+Characteristic *
+Service::find(VM_BT_GATT_ATTRIBUTE_HANDLE key)
 {
 	auto search = _byAttributeHandle.find(key);
 	if (search != _byAttributeHandle.end())
@@ -72,9 +74,9 @@ GATTService::find(VM_BT_GATT_ATTRIBUTE_HANDLE key)
 }
 
 void
-GATTService::registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle)
+Service::registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 {
-	GATTCharacteristic *tmp = findCharacteristic(key);
+	Characteristic *tmp = findCharacteristic(key);
 
 	if (tmp)
 	{
@@ -84,7 +86,7 @@ GATTService::registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT
 }
 
 void
-GATTService::registerMe(void *context)
+Service::registerMe(void *context)
 {
 	_context = context;
 	vm_log_info("adding service %x", &_serviceInfo);
@@ -92,7 +94,7 @@ GATTService::registerMe(void *context)
 }
 
 void
-GATTService::start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)
+Service::start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)
 {
 	if (!_started)
 	{
@@ -106,7 +108,7 @@ GATTService::start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle
 	}
 }
 
-void GATTService::initializeInfo()
+void Service::initializeInfo()
 {
 	memset(&_serviceInfo, 0x0, sizeof(_serviceInfo));
 	_serviceInfo.is_primary = _primary ? 1 : 0;

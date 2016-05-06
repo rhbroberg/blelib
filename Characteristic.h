@@ -1,15 +1,17 @@
-#ifndef GATTCharacteristic_h
-#define GATTCharacteristic_h
+#pragma once
 
-#include "GATTBase.h"
+#include "UUIDBase.h"
 #include "vmbt_gatt.h"
 
-class GATTCharacteristic : public GATTBase
+namespace gatt
+{
+
+class Characteristic : public UUIDBase
 {
 public:
-	GATTCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
-	GATTCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
-	virtual ~GATTCharacteristic();
+	Characteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
+	Characteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
+	virtual ~Characteristic();
 
 	void registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle);
 	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle);
@@ -27,4 +29,4 @@ protected:
 	bool _isRegistered;
 };
 
-#endif //  GATTCharacteristic_h
+}

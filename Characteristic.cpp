@@ -1,10 +1,12 @@
-#include "GATTCharacteristic.h"
+#include "Characteristic.h"
 #include "vmmemory.h"
 #include "string.h"
 #include "vmstdlib.h"
 #include "vmlog.h"
 
-GATTCharacteristic::GATTCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+using namespace gatt;
+
+Characteristic::Characteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
  : _properties(properties)
 , _permission(permission)
 , _isRegistered(false)
@@ -15,7 +17,7 @@ GATTCharacteristic::GATTCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERT
 	initializeAttribute();
 }
 
-GATTCharacteristic::GATTCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+Characteristic::Characteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
  : _properties(properties)
 , _permission(permission)
 , _isRegistered(false)
@@ -26,27 +28,27 @@ GATTCharacteristic::GATTCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES 
 	initializeAttribute();
 }
 
-GATTCharacteristic::~GATTCharacteristic()
+Characteristic::~Characteristic()
 {
 
 }
 
 void
-GATTCharacteristic::registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle)
+Characteristic::registerMe(void *contextHandle, VM_BT_GATT_ATTRIBUTE_HANDLE serviceHandle)
 {
 	vm_bt_gatt_server_add_characteristic(contextHandle, serviceHandle, &(_attribute.uuid), _properties, _permission);
 	_isRegistered = true;
 }
 
 void
-GATTCharacteristic::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
+Characteristic::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 {
 	vm_log_info("characteristic %s is now registered as %d", uuid(), handle);
 	_charHandle = handle;
 }
 
 void
-GATTCharacteristic::initializeAttribute()
+Characteristic::initializeAttribute()
 {
 	memset(&_attribute, 0x0, sizeof(_attribute));
 	_attribute.uuid.length = 16;

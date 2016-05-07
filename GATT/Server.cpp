@@ -20,7 +20,7 @@ Server::Server(VMUINT8 *hex, const char *name)
 
 	if (name)
 	{
-		vm_bt_cm_set_host_name((VMUINT8 *)name);
+		changeName(name);
 	}
 }
 
@@ -106,7 +106,7 @@ Server::findCharacteristic(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const
 	// iterate over services, search in each one
 	for (const auto & each : _byHandle)
 	{
-		if (activeChar = each.second->find(key))
+		if (activeChar = each.second->findCharacteristic(key))
 		{
 			break;
 		}
@@ -118,6 +118,25 @@ const bool
 Server::contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const
 {
 	return context == _context;
+}
+
+void
+Server::clientActivity(const bool connected)
+{
+	if (connected)
+	{
+		if (_connect)
+		{
+			_connect();
+		}
+	}
+	else
+	{
+		if (_disconnect)
+		{
+			_disconnect();
+		}
+	}
 }
 
 // static void callbacks go here
@@ -227,8 +246,9 @@ void
 Server::connection_callback(const vm_bt_gatt_connection_t *conn, VMBOOL connected,
 		const vm_bt_gatt_address_t *bd_addr)
 {
-	// maybe invoke callback for listener
 	vm_log_info("connection_callback connected [%d] [0x%x, 0x%x]", connected, conn->context_handle, conn->connection_handle);
+
+	_singleton->clientActivity(connected);
 }
 
 // static

@@ -62,7 +62,7 @@ Service::findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
 }
 
 Characteristic *
-Service::find(VM_BT_GATT_ATTRIBUTE_HANDLE key)
+Service::findCharacteristic(VM_BT_GATT_ATTRIBUTE_HANDLE key)
 {
 	auto search = _byAttributeHandle.find(key);
 	if (search != _byAttributeHandle.end())

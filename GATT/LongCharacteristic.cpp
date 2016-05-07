@@ -62,7 +62,7 @@ LongCharacteristic::initialize()
 const long
 LongCharacteristic::onRead()
 {
-	return getValue();
+	return *_value;
 }
 
 void

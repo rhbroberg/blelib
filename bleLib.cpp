@@ -101,6 +101,7 @@ void testme(void)
 	s2c3 = new StringCharacteristic(mys2c3UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
+	s2c3->setValue("do re me!");
 	myOtherService.addCharacteristic(s2c3);
 
 	VMUINT8 mys2c4UUID[] = { 0xFA, 0x33, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x04, 0xFB };

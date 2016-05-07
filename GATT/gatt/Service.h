@@ -17,7 +17,7 @@ public:
 	void addCharacteristic(Characteristic *gattChar);
 	void registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle);
 	Characteristic *findCharacteristic(vm_bt_gatt_attribute_uuid_t *key);
-	Characteristic *find(VM_BT_GATT_ATTRIBUTE_HANDLE key);
+	Characteristic *findCharacteristic(VM_BT_GATT_ATTRIBUTE_HANDLE key);
 
 	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle);
 	void registerMe(void *context);

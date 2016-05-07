@@ -61,18 +61,17 @@ StringCharacteristic::initialize()
 const char *
 StringCharacteristic::onRead()
 {
-	static const char *foo = "abc 123 do ray me";
-
-	vm_log_info("returning string %s", foo);
-	return foo;
+	vm_log_info("returning string %s", _string);
+	return _string;
 }
 
 void
-StringCharacteristic::onWrite(const char *value, const unsigned length) //= 0;
+StringCharacteristic::onWrite(const char *value, const unsigned length)
 {
-	static char localString[VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH];
-	memcpy(localString, value, length);
-	localString[length] = 0;
-
-	vm_log_info("string %s was written of length %d", localString, length);
+	if (length < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
+	{
+		memcpy(_string, value, length);
+		*(_string + length) = 0;
+		vm_log_info("string %s was written of length %d", _string, length);
+	}
 }

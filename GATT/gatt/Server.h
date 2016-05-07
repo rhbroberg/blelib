@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include "vmbt_cm.h"
+#include <functional>
 
 #include "gatt/UUIDBase.h"
 #include "gatt/Service.h"
@@ -15,12 +16,14 @@ class Server: public UUIDBase
 public:
 	Server(VMUINT8 *hex, const char *name = NULL);
 
+	void bindConnectionListener(std::function<void()> connect, std::function<void()> disconnect);
 	void addService(Service *service);
 	const bool enable();
 	void changeName(const char *name);
 
 protected:
 
+	void clientActivity(const bool connected);
 	void registerServices();
 	Service *findService(const VMUINT8 *hex) const;
 	Service *findService(const VM_BT_GATT_ATTRIBUTE_HANDLE key) const;
@@ -53,11 +56,12 @@ protected:
 			VM_BT_GATT_ATTRIBUTE_HANDLE attr_handle, vm_bt_gatt_attribute_value_t *value, VMUINT16 offset,
 			VMBOOL need_rsp, VMBOOL is_prep);
 
-	std::unordered_map<std::string, Service *> _services;
-	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
 	VMINT _handle;
 	void *_context;
 	vm_bt_gatt_server_callback_t _callbacks;
+	std::unordered_map<std::string, Service *> _services;
+	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
+	std::function <void()> _connect, _disconnect;
 	static Server *_singleton;
 };
 

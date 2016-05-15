@@ -11,8 +11,8 @@
 #include "bleLib.h"
 
 #include "gatt/Server.h"
-#include "gatt/LongCharacteristic.h"
-#include "gatt/LongHookCharacteristic.h"
+#include "gatt/ByteCharacteristic.h"
+#include "gatt/ByteHookCharacteristic.h"
 #include "gatt/StringCharacteristic.h"
 #include "gatt/StringHookCharacteristic.h"
 
@@ -29,10 +29,11 @@ Service myOtherService(myOtherServiceUUID, true);
 
 long myValue;
 
-LongHookCharacteristic *myChar = NULL;
-LongCharacteristic *c2 = NULL;
-LongCharacteristic *s2c1 = NULL;
-LongCharacteristic *s2c2 = NULL;
+ByteHookCharacteristic<long> *myChar = NULL;
+ByteCharacteristic<long> *c2 = NULL;
+ByteCharacteristic<long> *s2c1 = NULL;
+ByteCharacteristic<long> *s2c2 = NULL;
+
 StringCharacteristic *s2c3 = NULL;
 StringHookCharacteristic *s2c4 = NULL;
 
@@ -69,7 +70,7 @@ void testme(void)
 	std::function<const long()> myReadhook = [&] () { return myReadHook();};
 	std::function<void(const long value)> myWritehook = [&] (const long value) { return myWriteHook(value); };
 
-	myChar = new LongHookCharacteristic((VMUINT8 *) &myUUID,
+	myChar = new ByteHookCharacteristic<long>((VMUINT8 *) &myUUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 	myChar->setReadHook(myReadHook);
@@ -77,21 +78,21 @@ void testme(void)
 	myService.addCharacteristic(myChar);
 
 	VMUINT8 myc2UUID[] = { 0xFC, 0x35, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x02, 0xFD };
-	c2 = new LongCharacteristic(myc2UUID,
+	c2 = new ByteCharacteristic<long>(myc2UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ, &myValue);
 	myValue = 42;
 	myService.addCharacteristic(c2);
 
 	VMUINT8 mys2c12UUID[] = { 0xFC, 0x35, 0x9B, 0x5F, 0x90, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x01, 0x19, 0x2A, 0x02, 0xFD };
-	s2c1 = new LongCharacteristic(mys2c12UUID,
+	s2c1 = new ByteCharacteristic<long>(mys2c12UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 	s2c1->setValue(4);
 	myOtherService.addCharacteristic(s2c1);
 
 	VMUINT8 mys2c2UUID[] = { 0xFC, 0x35, 0x9B, 0x5F, 0xA0, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x02, 0x19, 0x2A, 0x02, 0xFD };
-	s2c2 = new LongCharacteristic(mys2c2UUID,
+	s2c2 = new ByteCharacteristic<long>(mys2c2UUID,
 			VM_BT_GATT_CHAR_PROPERTY_READ | VM_BT_GATT_CHAR_PROPERTY_WRITE,
 			VM_BT_GATT_PERMISSION_WRITE | VM_BT_GATT_PERMISSION_READ);
 	s2c2->setValue(5);

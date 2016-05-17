@@ -17,7 +17,7 @@ Service::Service(const char *uuid, const bool primary)
 	initializeInfo();
 }
 
-Service::Service(VMUINT8 *hex, const bool primary)
+Service::Service(const VMUINT8 *hex, const bool primary)
 : UUIDBase(hex)
 , _serviceHandle(0)
 , _primary(primary)

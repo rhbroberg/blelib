@@ -14,7 +14,7 @@ BaseCharacteristic<T>::BaseCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROP
 }
 
 template <class T>
-BaseCharacteristic<T>::BaseCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+BaseCharacteristic<T>::BaseCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
 : Characteristic(hex, properties, permission)
 {
 

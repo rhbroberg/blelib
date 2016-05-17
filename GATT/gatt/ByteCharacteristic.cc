@@ -14,7 +14,7 @@ ByteCharacteristic<T>::ByteCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROP
 }
 
 template <class T>
-ByteCharacteristic<T>::ByteCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, T *storage)
+ByteCharacteristic<T>::ByteCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, T *storage)
 : BaseCharacteristic<T>(hex, properties, permission)
 , _updated(false)
 , _value(storage)

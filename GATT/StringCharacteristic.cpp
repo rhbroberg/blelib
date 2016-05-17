@@ -16,7 +16,7 @@ StringCharacteristic::StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PRO
 	initialize();
 }
 
-StringCharacteristic::StringCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+StringCharacteristic::StringCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
 : StringBaseCharacteristic(hex, properties, permission)
 , _string(str)
 , _own(false)

@@ -13,7 +13,7 @@ StringBaseCharacteristic::StringBaseCharacteristic(const char *uuid, VM_BT_GATT_
 {
 }
 
-StringBaseCharacteristic::StringBaseCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+StringBaseCharacteristic::StringBaseCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
 : Characteristic(hex, properties, permission)
 {
 }

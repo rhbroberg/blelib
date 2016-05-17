@@ -10,7 +10,7 @@ class ByteCharacteristic : public BaseCharacteristic<T>
 {
 public:
 	ByteCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, T *storage = NULL);
-	ByteCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, T *storage = NULL);
+	ByteCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, T *storage = NULL);
 
 	virtual ~ByteCharacteristic();
 

@@ -18,7 +18,7 @@ UUIDBase::UUIDBase(const char *uuid)
 	initializeHexUUID();
 }
 
-UUIDBase::UUIDBase(VMUINT8 *hex)
+UUIDBase::UUIDBase(const VMUINT8 *hex)
 {
 	memcpy(_hexUUID, hex, sizeof(_hexUUID));
 	initializeCharUUID();

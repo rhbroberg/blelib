@@ -11,7 +11,7 @@ class ByteHookCharacteristic : public BaseCharacteristic<T>
 {
 public:
 	ByteHookCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
-	ByteHookCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
+	ByteHookCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission);
 
 	void setReadHook(std::function<const T(void)> hook);
 	void setWriteHook(std::function<void(const T)> hook);

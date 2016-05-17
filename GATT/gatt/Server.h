@@ -14,7 +14,7 @@ namespace gatt
 class Server: public UUIDBase
 {
 public:
-	Server(VMUINT8 *hex, const char *name = NULL);
+	Server(const VMUINT8 *hex, const char *name = NULL);
 
 	void bindConnectionListener(std::function<void()> connect, std::function<void()> disconnect);
 	void addService(Service *service);

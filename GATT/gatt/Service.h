@@ -12,7 +12,7 @@ class Service : public UUIDBase
 {
 public:
 	Service(const char *uuid, const bool primary = false);
-	Service(VMUINT8 *hex, const bool primary = false);
+	Service(const VMUINT8 *hex, const bool primary = false);
 
 	void addCharacteristic(Characteristic *gattChar);
 	void registerCharacteristic(vm_bt_gatt_attribute_uuid_t *key, VM_BT_GATT_ATTRIBUTE_HANDLE handle);

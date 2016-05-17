@@ -16,7 +16,7 @@ Characteristic::Characteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES prop
 	initializeAttribute();
 }
 
-Characteristic::Characteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+Characteristic::Characteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
  : UUIDBase(hex)
 , _properties(properties)
 , _permission(permission)

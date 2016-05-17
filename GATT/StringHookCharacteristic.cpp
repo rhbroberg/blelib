@@ -9,7 +9,7 @@ StringHookCharacteristic::StringHookCharacteristic(const char *uuid, VM_BT_GATT_
 {
 }
 
-StringHookCharacteristic::StringHookCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+StringHookCharacteristic::StringHookCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
 : StringBaseCharacteristic(hex, properties, permission)
 {
 }

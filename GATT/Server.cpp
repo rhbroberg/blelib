@@ -10,7 +10,7 @@ using namespace gatt;
 
 Server *Server::_singleton;
 
-Server::Server(VMUINT8 *hex, const char *name)
+Server::Server(const VMUINT8 *hex, const char *name)
 : UUIDBase(hex)
 , _handle(0)
 , _context(NULL)

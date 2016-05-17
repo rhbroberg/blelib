@@ -10,7 +10,7 @@ ByteHookCharacteristic<T>::ByteHookCharacteristic(const char *uuid, VM_BT_GATT_C
 }
 
 template <class T>
-ByteHookCharacteristic<T>::ByteHookCharacteristic(VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
+ByteHookCharacteristic<T>::ByteHookCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission)
 : BaseCharacteristic<T>(hex, properties, permission)
 {
 }

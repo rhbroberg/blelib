@@ -10,7 +10,7 @@ class UUIDBase
 public:
 	UUIDBase();
 	UUIDBase(const char *uuid);
-	UUIDBase(VMUINT8 *hex);
+	UUIDBase(const VMUINT8 *hex);
 
 	virtual ~UUIDBase();
 

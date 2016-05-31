@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <string>
 #include "vmbt_cm.h"
 #include <functional>
@@ -59,8 +59,8 @@ protected:
 	VMINT _handle;
 	void *_context;
 	vm_bt_gatt_server_callback_t _callbacks;
-	std::unordered_map<std::string, Service *> _services;
-	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
+	std::map<std::string, Service *> _services;
+	std::map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
 	std::function <void()> _connect, _disconnect;
 	static Server *_singleton;
 };

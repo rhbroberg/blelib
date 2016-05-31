@@ -34,7 +34,7 @@ Service::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 	// iterate over characteristics now, register each one
 	for (const auto & each : _byUUID)
 	{
-		vm_log_info("registering char of %s", each.second->uuid());
+		vm_log_info("service %s registering char of %s", uuid(), each.second->uuid());
 		each.second->registerMe(_context, _serviceHandle);
 	}
 }
@@ -42,7 +42,7 @@ Service::registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle)
 void
 Service::addCharacteristic(Characteristic *gattChar)
 {
-	vm_log_info("adding char of %s", gattChar->uuid());
+	vm_log_info("service %s adding char of %s", uuid(), gattChar->uuid());
 	_byUUID[gattChar->uuid()] = gattChar;
 }
 
@@ -52,7 +52,7 @@ Service::findCharacteristic(vm_bt_gatt_attribute_uuid_t *key)
 	char tmpKey[32];
 
 	stringify(key->uuid.uuid, tmpKey);
-	vm_log_info("searching char of %s", tmpKey);
+	vm_log_info("service %s searching char of %s", uuid(), tmpKey);
 	auto search = _byUUID.find(tmpKey);
 	if (search != _byUUID.end())
 	{
@@ -88,7 +88,7 @@ void
 Service::registerMe(void *context)
 {
 	_context = context;
-	vm_log_info("adding service %x", &_serviceInfo);
+	vm_log_info("adding service %s", uuid());
 	vm_bt_gatt_server_add_service(_context, &_serviceInfo, 10);
 }
 
@@ -97,13 +97,13 @@ Service::start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)
 {
 	if (!_started)
 	{
-		vm_log_info("starting service");
+		vm_log_info("starting service %s", uuid());
 		_started = true;
 		vm_bt_gatt_server_start_service(context_handle, srvc_handle);
 	}
 	else
 	{
-		vm_log_info("service already running, not starting");
+		vm_log_info("service %s already running, not starting", uuid());
 	}
 }
 

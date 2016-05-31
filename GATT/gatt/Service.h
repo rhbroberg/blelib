@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <string>
 
 #include "gatt/Characteristic.h"
@@ -27,8 +27,8 @@ protected:
 	void initializeInfo();
 
 	vm_bt_gatt_service_info_t _serviceInfo;
-	std::unordered_map<std::string, Characteristic *> _byUUID;
-	std::unordered_map<VM_BT_GATT_ATTRIBUTE_HANDLE, Characteristic *> _byAttributeHandle;
+	std::map<std::string, Characteristic *> _byUUID;
+	std::map<VM_BT_GATT_ATTRIBUTE_HANDLE, Characteristic *> _byAttributeHandle;
 	bool _primary;
 	bool _started;
 

@@ -37,6 +37,13 @@ Server::addService(Service *service)
 	_services[service->uuid()] = service;
 }
 
+void
+Server::bindConnectionListener(std::function<void()> connect, std::function<void()> disconnect)
+{
+	_connect = connect;
+	_disconnect = disconnect;
+}
+
 const bool
 Server::enable()
 {
@@ -78,7 +85,7 @@ Server::findService(const VMUINT8 *hex) const
 	char tmpKey[32];
 
 	stringify(hex, tmpKey);
-	vm_log_info("searching char of %s", tmpKey);
+	vm_log_info("searching service named %s", tmpKey);
 	auto search = _services.find(tmpKey);
 	if (search != _services.end())
 	{
@@ -175,7 +182,7 @@ Server::register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOO
 
 	if (status == 0)
 	{
-		vm_log_info("registering rhb services");
+		vm_log_info("registering services");
 		_singleton->registerServices();
 	}
 }
@@ -187,7 +194,7 @@ Server::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_
 {
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
-		vm_log_info("rhb service add callback adding characteristics");
+		vm_log_info("service add callback adding characteristics");
 
 		if (Service *activeService = _singleton->findService(srvc_id->uuid.uuid.uuid))
 		{
@@ -230,7 +237,7 @@ Server::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE contex
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
 		vm_bt_gatt_server_listen(context_handle, VM_TRUE);
-		vm_log_info("listening on service");
+		vm_log_info("service started");
 	}
 }
 
@@ -238,7 +245,7 @@ Server::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE contex
 void
 Server::listen_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status)
 {
-	vm_log_info("listen_callback");
+	vm_log_info("gatt server now listening");
 }
 
 // static

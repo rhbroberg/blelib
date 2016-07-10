@@ -19,6 +19,7 @@ public:
 	void bindConnectionListener(std::function<void()> connect, std::function<void()> disconnect);
 	void addService(Service *service);
 	const bool enable();
+	void disable();
 	void changeName(const char *name);
 
 protected:
@@ -39,6 +40,7 @@ protected:
 	static void register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status, VMUINT8 *app_uuid);
 	static void service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_service_info_t *srvc_id, VM_BT_GATT_SERVICE_HANDLE srvc_handle);
+	static void service_stopped_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle, VM_BT_GATT_SERVICE_HANDLE srvc_handle);
 	static void characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 			VM_BT_GATT_CHARACTERISTIC_HANDLE char_handle);

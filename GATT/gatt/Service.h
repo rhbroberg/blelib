@@ -22,6 +22,7 @@ public:
 	void registered(VM_BT_GATT_ATTRIBUTE_HANDLE handle);
 	void registerMe(void *context);
 	void start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle);
+	void stop(const bool updateRadio = false);
 
 protected:
 	void initializeInfo();

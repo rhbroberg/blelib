@@ -8,8 +8,8 @@ namespace gatt
 class StringCharacteristic : public StringBaseCharacteristic
 {
 public:
-	StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str = NULL);
-	StringCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str = NULL);
+	StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str = NULL, const unsigned short maxLen = 16);
+	StringCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str = NULL, const unsigned short maxLen = 16);
 	virtual ~StringCharacteristic();
 
 	void setValue(const char *str);
@@ -22,5 +22,6 @@ protected:
 
 	bool _own;
 	char *_string;
+	const short _length;
 };
 }

@@ -44,6 +44,22 @@ Server::bindConnectionListener(std::function<void()> connect, std::function<void
 	_disconnect = disconnect;
 }
 
+void
+Server::disable()
+{
+	vm_log_info("stopping server %s", uuid());
+
+	// must stop each mapped Service, otherwise upon next powerup they won't re-register
+	for (const auto & each : _services)
+	{
+		each.second->stop();
+	}
+
+	vm_log_info("bluetooth power status:%d", vm_bt_cm_get_power_status());
+	vm_bt_cm_switch_off();
+	vm_log_info("bluetooth power status after switching off :%d", vm_bt_cm_get_power_status());
+}
+
 const bool
 Server::enable()
 {
@@ -206,6 +222,20 @@ Server::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_
 
 // static
 void
+Server::service_stopped_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle, VM_BT_GATT_SERVICE_HANDLE srvc_handle)
+{
+	if (_singleton->contextValid(context_handle) && status == 0)
+	{
+		vm_log_info("service stopped callback");
+
+		// findService another way, mark it as disabled; or maybe just count
+		// stopped services and know we're done once the count is the same as what we have
+		// does it really matter if shutting down?
+	}
+}
+
+// static
+void
 Server::characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 		VM_BT_GATT_CHARACTERISTIC_HANDLE char_handle)
@@ -295,6 +325,7 @@ Server::setCallbacks()
 {
 	_callbacks.register_server = register_server_callback;
 	_callbacks.service_added = service_added_callback;
+	_callbacks.service_stopped = service_stopped_callback;
 	_callbacks.characteristic_added = characteristic_added_callback;
 	_callbacks.descriptor_added = descriptor_added_callback;
 	_callbacks.service_started = service_started_callback;
@@ -305,7 +336,6 @@ Server::setCallbacks()
 
 #ifdef NOTYET
 	_callbacks.included_service_added = add_included_service_callback;
-	_callbacks.service_stopped = service_stopped_callback;
 	_callbacks.service_deleted = service_deleted_callback;
 	_callbacks.request_exec_write = request_exec_write_callback;
 	_callbacks.response_confirmation = response_confirmation_callback;

@@ -8,18 +8,20 @@
 
 using namespace gatt;
 
-StringCharacteristic::StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+StringCharacteristic::StringCharacteristic(const char *uuid, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str, const unsigned short maxLen)
 : StringBaseCharacteristic(uuid, properties, permission)
 , _string(str)
 , _own(false)
+, _length(maxLen < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH ? maxLen : VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
 {
 	initialize();
 }
 
-StringCharacteristic::StringCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str)
+StringCharacteristic::StringCharacteristic(const VMUINT8 *hex, VM_BT_GATT_CHAR_PROPERTIES properties, VM_BT_GATT_PERMISSION permission, char *str, const unsigned short maxLen)
 : StringBaseCharacteristic(hex, properties, permission)
 , _string(str)
 , _own(false)
+, _length(maxLen < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH ? maxLen : VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
 {
 	initialize();
 }
@@ -35,11 +37,10 @@ StringCharacteristic::~StringCharacteristic()
 void
 StringCharacteristic::setValue(const char *str)
 {
-	if (strlen(str) < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
-	{
-		memcpy(_string, str, strlen(str));
-	}
-	// fix: status value return if too big?
+	unsigned safeLength = ((strlen(str) < _length) ? strlen(str) : _length) - 1;
+	memcpy(_string, str, safeLength);
+	*(_string + safeLength) = 0;
+	// presently silently ignore truncated string
 }
 
 const char *
@@ -53,8 +54,9 @@ StringCharacteristic::initialize()
 {
 	if (! _string)
 	{
-		_string = new char[VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH];
+		_string = new char[_length + 1];
 		_own = true;
+		memset(_string, 0, _length + 1);
 	}
 }
 
@@ -68,10 +70,9 @@ StringCharacteristic::onRead()
 void
 StringCharacteristic::onWrite(const char *value, const unsigned length)
 {
-	if (length < VM_BT_GATT_ATTRIBUTE_MAX_VALUE_LENGTH)
-	{
-		memcpy(_string, value, length);
-		*(_string + length) = 0;
-		vm_log_info("string %s was written of length %d", _string, length);
-	}
+	unsigned safeLength = ((length < _length) ? length : _length) - 1;
+	memcpy(_string, value, safeLength);
+	*(_string + safeLength) = 0;
+	vm_log_info("string %s was written of length %d", _string, safeLength);
+	// presently silently ignore truncated string
 }

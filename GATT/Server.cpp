@@ -162,6 +162,21 @@ Server::clientActivity(const bool connected)
 	}
 }
 
+const bool
+Server::areAllServicesStarted()
+{
+	vm_log_info("checking if all services are registered");
+
+	for (const auto & each : _services)
+	{
+		if (!each.second->isStarted())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 // static void callbacks go here
 // static
 void
@@ -198,6 +213,11 @@ Server::register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOO
 
 	if (status == 0)
 	{
+#ifdef INEFFECTIVE
+		vm_log_debug("disabling listener");
+		vm_bt_gatt_server_listen(context_handle, VM_TRUE);
+#endif
+
 		vm_log_info("registering services");
 		_singleton->registerServices();
 	}
@@ -264,6 +284,9 @@ void
 Server::service_started_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 		VM_BT_GATT_SERVICE_HANDLE srvc_handle)
 {
+	// this should probably not happen until after all services and characteristics have fully registered themselves, else a client can get an incomplete
+	// view of what's available.  'starting service %x' is when each is ready
+	// too bad - it seems like this callback is never invoked
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
 		vm_bt_gatt_server_listen(context_handle, VM_TRUE);
@@ -347,5 +370,48 @@ void
 Server::start()
 {
 	vm_bt_gatt_server_register(_hexUUID, &_callbacks);
+#ifdef BROKEN_INTERACTS_WITH_SERVER_REGISTER
+	_client_callbacks.register_client = register_client_callback;
+	_client_callbacks.set_advertisement_data = set_advertisement_data_callback;
+
+	vm_bt_gatt_client_register(_singleton->_hexUUID, & _client_callbacks);
+#endif
 	vm_log_debug("starting server %s", uuid());
 }
+
+#ifdef BUSTED
+const VMUINT8 copy_of_gsm_service[] = { 0xF0, 0x40, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x19, 0x2A, 0x09, 0x00 };
+
+/** Callback triggered in response to set_advertisement_data. */
+// static
+void
+Server::set_advertisement_data_callback(VM_BT_GATT_CONTEXT_HANDLE context, VMBOOL has_error)
+{
+	vm_log_info("set_advertisement_data cb has error %d", has_error);
+}
+
+static vm_bt_gatt_client_callback_t _client_callbacks;
+// static
+void
+Server::register_client_callback(VM_BT_GATT_CONTEXT_HANDLE context, VMBOOL has_error, VMUINT8 app_uuid[16])
+{
+	vm_log_debug("client callback sez registered");
+
+		static VMCHAR manufacturer[6];
+		memcpy(manufacturer, "rikker", 6);
+		static VMCHAR service_data[6];
+		memcpy(service_data, "foobar", 6);
+
+		static vm_bt_uuid_with_length_t advertisedUuids;
+		advertisedUuids.length = 2;
+		memcpy(advertisedUuids.uuid, copy_of_gsm_service, 16);
+
+		VM_RESULT advertising = vm_bt_gatt_server_set_advertisement_data(context, 0, VM_TRUE, VM_TRUE,
+				1000, 5000, 1111,
+		        6, manufacturer,
+		        6, service_data,
+		        &advertisedUuids);
+		vm_log_info("set advertising status: %d", advertising);
+}
+
+#endif

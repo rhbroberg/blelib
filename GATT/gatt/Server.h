@@ -33,10 +33,13 @@ protected:
 	const bool contextValid(const VM_BT_GATT_CONTEXT_HANDLE context) const;
 	void setCallbacks();
 	void start();
+	const bool areAllServicesStarted();
 
 	// static void callbacks go here
 	static void btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data);
 
+	static void set_advertisement_data_callback(VM_BT_GATT_CONTEXT_HANDLE context, VMBOOL has_error);
+	static void register_client_callback(VM_BT_GATT_CONTEXT_HANDLE context, VMBOOL has_error, VMUINT8 app_uuid[16]);
 	static void register_server_callback(VM_BT_GATT_CONTEXT_HANDLE context_handle, VMBOOL status, VMUINT8 *app_uuid);
 	static void service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_service_info_t *srvc_id, VM_BT_GATT_SERVICE_HANDLE srvc_handle);

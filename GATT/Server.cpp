@@ -27,8 +27,15 @@ Server::Server(const VMUINT8 *hex, const char *name)
 void
 Server::changeName(const char *name)
 {
+	// empty string crashes ble service, forces part to be reflashed
+	// while we're at it, force part to have a name at least 2 bytes long
+	if (! name || (strlen(name) < 2))
+	{
+		vm_log_info("anemic ble server name defined; defaulting to safe value");
+		name = "mytracker";
+	}
+
 	vm_bt_cm_set_host_name((VMUINT8 *)name);
-	// fix: probably have to bounce btcm here
 }
 
 void
@@ -44,20 +51,32 @@ Server::bindConnectionListener(std::function<void()> connect, std::function<void
 	_disconnect = disconnect;
 }
 
+// make disable take a completion handler closure for what to do once completely disabled; in the case of firmware upgrade, it will be to invoke the magic line
 void
-Server::disable()
+Server::disable(std::function<void()> completionHandler)
 {
 	vm_log_info("stopping server %s", uuid());
+	_disableCallback = completionHandler;
 
 	// must stop each mapped Service, otherwise upon next powerup they won't re-register
 	for (const auto & each : _services)
 	{
-		each.second->stop();
+		each.second->stop(true);
 	}
+}
 
+void
+Server::poweroff()
+{
 	vm_log_info("bluetooth power status:%d", vm_bt_cm_get_power_status());
 	vm_bt_cm_switch_off();
 	vm_log_info("bluetooth power status after switching off :%d", vm_bt_cm_get_power_status());
+
+	vm_bt_cm_exit(_handle);
+	if (_disableCallback)
+	{
+		_disableCallback();
+	}
 }
 
 const bool
@@ -177,6 +196,21 @@ Server::areAllServicesStarted()
 	return true;
 }
 
+const bool
+Server::areAllServicesStopped()
+{
+	vm_log_info("checking if all services are stopped/deleted");
+
+	for (const auto & each : _services)
+	{
+		if (each.second->isStarted())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 // static void callbacks go here
 // static
 void
@@ -242,15 +276,52 @@ Server::service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_
 
 // static
 void
-Server::service_stopped_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle, VM_BT_GATT_SERVICE_HANDLE srvc_handle)
+Server::service_stopped_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle, VM_BT_GATT_SERVICE_HANDLE service_handle)
 {
 	if (_singleton->contextValid(context_handle) && status == 0)
 	{
-		vm_log_info("service stopped callback");
+		vm_log_info("service stopped callback for %x", service_handle);
 
-		// findService another way, mark it as disabled; or maybe just count
-		// stopped services and know we're done once the count is the same as what we have
-		// does it really matter if shutting down?
+		vm_bt_gatt_server_delete_service(context_handle, service_handle);
+	}
+}
+
+// static
+void
+Server::service_deleted_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle , VM_BT_GATT_SERVICE_HANDLE service)
+{
+	vm_log_info("service deleted callback for %x", service);
+	if (_singleton->contextValid(context_handle) && status == 0)
+	{
+		if (Service *activeService = _singleton->findService(service))
+		{
+			activeService->didStop();
+#ifdef NOT_WANTED
+// actually do not want to erase entries, or it won't start up again after sleep; only want to set some new attribute that they are removed
+			vm_log_info("found activeService %s", activeService->uuid());
+			if (_singleton->_byHandle.erase(service) == 1)
+			{
+				vm_log_info("and erase it byHandle");
+			}
+			if (_singleton->_services.erase(activeService->uuid()) == 1)
+			{
+				vm_log_info("and erase it services");
+			}
+
+			delete activeService;
+
+			if (_singleton->_byHandle.size() == 0)
+			{
+				vm_log_info("and now his watch is ended");
+				poweroff();
+			}
+#endif
+			if (_singleton->areAllServicesStopped())
+			{
+				vm_log_info("and now his watch is ended");
+				_singleton->poweroff();
+			}
+		}
 	}
 }
 
@@ -356,10 +427,10 @@ Server::setCallbacks()
 	_callbacks.connection = connection_callback;
 	_callbacks.request_read = request_read_callback;
 	_callbacks.request_write = request_write_callback;
+	_callbacks.service_deleted = service_deleted_callback;
 
 #ifdef NOTYET
 	_callbacks.included_service_added = add_included_service_callback;
-	_callbacks.service_deleted = service_deleted_callback;
 	_callbacks.request_exec_write = request_exec_write_callback;
 	_callbacks.response_confirmation = response_confirmation_callback;
 	_callbacks.read_tx_power = NULL;

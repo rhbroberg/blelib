@@ -116,6 +116,12 @@ Service::start(void *context_handle, VM_BT_GATT_ATTRIBUTE_HANDLE srvc_handle)
 }
 
 void
+Service::didStop()
+{
+	_started = false;
+}
+
+void
 Service::stop(const bool updateRadio)
 {
 	if (_started)
@@ -123,11 +129,15 @@ Service::stop(const bool updateRadio)
 		vm_log_info("service %s shutting down", uuid());
 		if (updateRadio)
 		{
-			vm_bt_gatt_server_start_service(_context, _serviceHandle);
+			vm_bt_gatt_server_stop_service(_context, _serviceHandle);
+			// callback will set _started to false
+		}
+		else
+		{
+			_started = false;
 		}
 		// start fresh for next time
 		_byAttributeHandle.clear();
-		_started = false;
 	}
 }
 

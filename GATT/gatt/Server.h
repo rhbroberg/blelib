@@ -19,7 +19,8 @@ public:
 	void bindConnectionListener(std::function<void()> connect, std::function<void()> disconnect);
 	void addService(Service *service);
 	const bool enable();
-	void disable();
+	void disable(std::function<void()> callback = NULL);
+	void poweroff();
 	void changeName(const char *name);
 
 protected:
@@ -34,6 +35,7 @@ protected:
 	void setCallbacks();
 	void start();
 	const bool areAllServicesStarted();
+	const bool areAllServicesStopped();
 
 	// static void callbacks go here
 	static void btcm_callback(VM_BT_CM_EVENT evt, void *param, void *user_data);
@@ -44,6 +46,8 @@ protected:
 	static void service_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_service_info_t *srvc_id, VM_BT_GATT_SERVICE_HANDLE srvc_handle);
 	static void service_stopped_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle, VM_BT_GATT_SERVICE_HANDLE srvc_handle);
+	static void service_deleted_callback(VMBOOL has_error, VM_BT_GATT_CONTEXT_HANDLE context, VM_BT_GATT_SERVICE_HANDLE service);
+
 	static void characteristic_added_callback(VMBOOL status, VM_BT_GATT_CONTEXT_HANDLE context_handle,
 			vm_bt_gatt_attribute_uuid_t *uuid, VM_BT_GATT_SERVICE_HANDLE srvc_handle,
 			VM_BT_GATT_CHARACTERISTIC_HANDLE char_handle);
@@ -67,6 +71,7 @@ protected:
 	std::map<std::string, Service *> _services;
 	std::map<VM_BT_GATT_ATTRIBUTE_HANDLE, Service *> _byHandle;
 	std::function <void()> _connect, _disconnect;
+	std::function <void()> _disableCallback;
 	static Server *_singleton;
 };
 
